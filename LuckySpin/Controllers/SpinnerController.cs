@@ -43,6 +43,11 @@ namespace LuckySpin.Controllers
             _dbc.Players.Add(player);
             _dbc.SaveChanges();
 
+            //if (player.Balance < 0.50m)
+            //{
+            //    RedirectToAction("LuckList", player.Id);
+            //}
+
             //pass the player.Id to the SpinIt action
             return RedirectToAction("SpinIt", new { id = player.Id });
         }
@@ -71,6 +76,26 @@ namespace LuckySpin.Controllers
             spinVM.IsWinning = (spinVM.A == spinVM.Luck || spinVM.B == spinVM.Luck || spinVM.C == spinVM.Luck);
 
             //TODO : Add LuckySpin Game Logic (review flow chart for details)
+            if (currentPlayer.Balance <= 0.50m)
+            {
+                return RedirectToAction("LuckList", new {currentPlayer.Id});
+            }
+
+            else
+            {
+                currentPlayer.Balance = currentPlayer.Balance - 0.50m;
+
+                if (spinVM.IsWinning)
+                {
+                    ViewBag.Display = "block";
+                    currentPlayer.Balance = currentPlayer.Balance + 1.00m;
+                }
+                else
+                {
+                    ViewBag.Display = "none";
+                }
+                spinVM.Balance = currentPlayer.Balance;
+            }
 
 
             //Prepare the ViewBag
